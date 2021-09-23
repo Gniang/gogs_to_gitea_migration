@@ -10,7 +10,7 @@ ${GOGS_DIR}gogs buckup
 pg_dump -U gogs --format custom > gogs_latest.sql
 #sudo docker exec gogs_gogs_postgres_1 pg_dump -U gogs --format custom > gogs_latest.sql
 
-cp gogs_latest.sql ~/docker/gitea/gogs_latest.sql
+# cp gogs_latest.sql ./gogs_latest.sql
 
 # リポジトリ情報　コピーするかどうか迷う
 # ネットワークドライブでマウントするのはありなのかどうか？
@@ -19,7 +19,7 @@ cp -r ~/gogs-repositories ./gitea-repositories
 cp ${GOGS_DIR}custom/conf/app.ini ./app_gogs.ini
 ```
 
-#### app.ini書き換え
+#### app_gogs.ini書き換え
 
 コメントのところはgogsの方にあれば適用する
 
@@ -35,7 +35,7 @@ NAME     = gitea
 USER     = gitea
 PASSWD   = gitea
 [repository]
-ROOT = /repositories
+ROOT = /repositories 
 # [session]
 # PROVIDER_CONFIG = /data/gitea/sessions
 [picture]
@@ -57,11 +57,11 @@ sudo rm -rf ./postgres/
 
 sudo docker-compose up -d gitea_db
 
-mkdir -p ./gitea/gitea/custom/conf/
-cp ./app_gogs.ini ./gitea/gitea/custom/conf/app.ini
+mkdir -p ./gitea/gitea/conf/
+cp ./app_gogs.ini ./gitea/gitea/conf/app.ini
 # 以下2つはカスタマイズしてなければないかも
-cp -r ${GOGS_DIR}custom/public/ ./gitea/gitea/custom/
-cp -r ${GOGS_DIR}custom/templates/ ./gitea/gitea/custom/
+cp -r ${GOGS_DIR}custom/public/ ./gitea/gitea/
+cp -r ${GOGS_DIR}custom/templates/ ./gitea/gitea/
 # メインデータ
 cp -r ${GOGS_DIR}data/* ./gitea/gitea/
 
@@ -70,8 +70,6 @@ cp -r ${GOGS_DIR}data/* ./gitea/gitea/
 
 # ownerをgiteaに直してリストアする
 cat gogs_latest.sql | sudo docker exec -i gitea_gitea_db_1 pg_restore  -U gitea -d gitea --no-owner --role=gitea
-
-# git/hookの書き換えが必要
 
 
 # gitea起動
@@ -120,4 +118,10 @@ rm -rf ~/temp/gogs-repositories/*/*.git/hooks/post-receive.d/post-receive
 # backup.shの設定
 
 # リバースプロキシ切替作業
+
+
+## GOGSに戻すときは以下を消さないとhookでエラーになる
+rm -rf ~/temp/gogs-repositories/*/*.git/hooks/pre-receive.d/*
+rm -rf ~/temp/gogs-repositories/*/*.git/hooks/post-receive.d/*
+rm -rf ~/temp/gogs-repositories/*/*.git/hooks/update.d/*
 ```
