@@ -1,8 +1,10 @@
+```bash
 GOGS_DIR=~/temp/gogs/
 GITEA_DIR=./
 
-# cd ${GOGS_DIR}
-# 念のため
+# cd ./docker-compose/gitea
+
+# 念のためバックアップ
 ${GOGS_DIR}gogs buckup 
 # DBデータ
 pg_dump -U gogs --format custom > gogs_latest.sql
@@ -14,11 +16,14 @@ cp gogs_latest.sql ~/docker/gitea/gogs_latest.sql
 # ネットワークドライブでマウントするのはありなのかどうか？
 cp -r ~/gogs-repositories ./gitea-repositories
 
-# cd ./docker-compose/gitea
 cp ${GOGS_DIR}custom/conf/app.ini ./app_gogs.ini
+```
 
-# app.ini書き換え
-```bash コメントのところはgogsの方にあれば適用する
+#### app.ini書き換え
+
+コメントのところはgogsの方にあれば適用する
+
+```bash 
 APP_NAME = Gitea
 RUN_USER = git
 # [server]
@@ -41,7 +46,7 @@ PATH = /data/gitea/attachments
 ROOT_PATH = /data/gitea/log
 ```
 
-
+```bash
 cp ${GOGS_DIR}gogs_latest.sql ${GITEA_DIR}
 
 
@@ -115,3 +120,4 @@ rm -rf ~/temp/gogs-repositories/*/*.git/hooks/post-receive.d/post-receive
 # backup.shの設定
 
 # リバースプロキシ切替作業
+```
